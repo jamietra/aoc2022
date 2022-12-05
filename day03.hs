@@ -3,6 +3,8 @@ import System.Environment ( getArgs )
 
 scores :: [(Int, Char)]
 scores = zip [1..] ['a'..'z'] ++ zip [27..] ['A'..'Z']
+
+
 example :: [String]
 example = ["vJrwpWtwJgWrhcsFMMfFFhFp", "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL", "PmmdzqPrVvPwwTWBwg", "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn", "ttgJtRGJQctTZtZT", "CrZsJsPPZsGzwwsLwLmpwMDw"]
 
@@ -40,4 +42,4 @@ main = do
     args <- getArgs
     f <- readFile $ head args
     print $ solve1 $ lines f
-    -- print $ solve2 $ lines f
+    print $ solve2 $ lines f
