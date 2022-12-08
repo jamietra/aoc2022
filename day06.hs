@@ -6,9 +6,9 @@ s = "bvwbjplbgvbhsrlpgdmjqwftvncz"
 
 solven :: Int -> Int -> String -> Int
 solven _ i [] = i
-solven n i xs
-    | length (nub $ take n xs) == n = (i + n)
-    | otherwise = solven n (i + 1) (tail xs)
+solven n i (x:xs)
+    | length (nub $ take n (x:xs)) == n = i + n
+    | otherwise = solven n (i + 1) xs
 
 solve1 :: String -> Int
 solve1 = solven 4 0
@@ -20,5 +20,6 @@ solve2 = solven 14 0
 main :: IO ()
 main = do
     f <- readFile "input/input6.txt"
-    print $ solve1 f
-    print $ solve2 f
+    print $ length f
+    print $ solve1 $ concat $ replicate 100 f
+    print $ solve2 $ concat $ replicate 100 f
