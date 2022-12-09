@@ -1,6 +1,7 @@
 import Data.List
 import Data.IntMap.Merge.Lazy (merge)
 import Language.Haskell.TH (fromE)
+import System.Directory.Internal.Prelude (getArgs)
 
 
 example = "\
@@ -33,7 +34,14 @@ mergeGridsWith :: (a -> a -> b) -> [[a]] -> [[a]] -> [[b]]
 mergeGridsWith f xs ys = [zipWith f (xs !! i) (ys !! i) | i <- [0..length xs - 1]]
 
 solve1 :: String -> Int
-solve1 s = sum (map (sum . map fromEnum) $ mergeGridsWith (||) (mapInteriorVisible xss) (transpose $ mapInteriorVisible $ transpose xss)) + (4 * length xss - 4)
+solve1 s = sum (
+    map (sum . map fromEnum) 
+        $ mergeGridsWith (||) 
+            (mapInteriorVisible xss) 
+            (transpose $ mapInteriorVisible $ transpose xss)
+    ) 
+    + (4 * length xss - 4)
+
     where xss = parseInput s
 
 rowViewDistances :: [Int] -> [Int]
@@ -54,7 +62,8 @@ visualize xss = putStr $ unlines $ map (unwords . map ((\s -> if s == "1" then "
 
 main :: IO ()
 main = do
-    f <- readFile "input/input8.txt"
-    visualize $ mergeGridsWith (||) (mapInteriorVisible (parseInput f)) (transpose $ mapInteriorVisible $ transpose (parseInput f))
+    args <- getArgs
+    f <- readFile $ head args
+    -- visualize $ mergeGridsWith (||) (mapInteriorVisible (parseInput f)) (transpose $ mapInteriorVisible $ transpose (parseInput f))
     print $ solve1 f
     print $ solve2 f
