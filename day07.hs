@@ -1,6 +1,7 @@
 import Data.Tree
 import qualified Data.List as List
 import Data.Traversable ( mapAccumL )
+import System.Directory.Internal.Prelude (getArgs)
 
 example :: String
 example = "$ cd /\n\
@@ -66,10 +67,10 @@ allDirSizes (Node c []) = Node c []
 allDirSizes (Node c subs) = Node (rootLabel $ sizeDir (Node c subs)) (map allDirSizes subs)
 
 buildFile :: [String] -> [String] -> FileOrDir
-buildFile stack [x, y] = File (List.intercalate "-" $ reverse (y:stack), read x)
+buildFile stack [x, y] = File (unwords $ reverse (y:stack), read x)
 
 buildDir :: [String] -> [String] -> FileOrDir
-buildDir stack [x, y] = Dir (List.intercalate "-" $ reverse (y:stack), 0)
+buildDir stack [x, y] = Dir (unwords $ reverse (y:stack), 0)
 
 buildFileOrDir :: String  -> [String] -> FileOrDir
 buildFileOrDir xs stack
@@ -95,7 +96,7 @@ cleanCommandList = map (drop 3) . filter (/= "ls") . map (drop 2)
 buildFileStructure :: [String] -> ([String], [String]) -> ([String], Tree FileOrDir)
 buildFileStructure dirStack (commands, results) = 
     (newStack
-    , Node (Dir (List.intercalate "-" $ reverse newStack, 0)) (map (\s -> Node (buildFileOrDir s newStack) []) results))
+    , Node (Dir (unwords $ reverse newStack, 0)) (map (\s -> Node (buildFileOrDir s newStack) []) results))
     where 
         newStack = getNewDir dirStack commands
 
@@ -154,6 +155,7 @@ solve2 s = getBiggestLessThan (getNeededToDelete sizeList) sizeList
 
 main :: IO ()
 main = do
-    f <- readFile "input/input7.txt"
+    args <- getArgs
+    f <- readFile $ head args
     print $ solve1 f
     print $ solve2 f
