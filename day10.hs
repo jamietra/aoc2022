@@ -1,4 +1,5 @@
 import Data.List
+import Data.Sequence (chunksOf)
 
 type Instruction = (String, Int -> Int)
 
@@ -8,6 +9,11 @@ readInstruction ["addx", y] = ("addx", (+) yint)
     where
         yint = read y::Int
 
+splitEvery :: Int -> [a] -> [[a]]
+splitEvery _ [] = []
+splitEvery n xs = as : splitEvery n bs
+  where (as,bs) = splitAt n xs
+
 parseInput :: String -> [Instruction]
 parseInput = map (readInstruction . words) . lines
 
@@ -16,31 +22,25 @@ instructionToRepeats ("noop", _)  = 1
 instructionToRepeats ("addx", _)  = 2
 
 addInstruction :: [Int] -> Instruction ->  [Int]
-addInstruction [idx, rx] i = [idx + instructionToRepeats i, snd i rx]
+addInstruction (x:xs) i = snd i x : replicate (instructionToRepeats i) x ++ xs 
 
-instructionsToRegisterSeries :: [Instruction] -> [[Int]]
-instructionsToRegisterSeries = scanl addInstruction [1, 1]
+instructionsToRegisterSeries :: [Instruction] -> [Int]
+instructionsToRegisterSeries = reverse . foldl' addInstruction [1]
 
-getSumProds :: [Int] -> [[Int]] -> Int
-getSumProds idxs regs = sum [i * getSprite i regs | i <- idxs]
-
-getSprite :: Int -> [[Int]] -> Int
-getSprite i regs = last (takeWhile (\[x, y] -> x <= i) regs) !! 1
+getSumProds :: [Int] -> [Int] -> Int
+getSumProds idxs regs = sum $ zipWith (*) (map (\i -> regs !! (i - 1)) idxs) idxs
 
 solve1 :: String -> Int
 solve1 = getSumProds (take 6 (20:[20 + i * 40 | i <- [1..]])) . instructionsToRegisterSeries . parseInput
 
-getCharToDraw :: [[Int]] -> Int -> Char
-getCharToDraw sprites clock = if pos `elem` [s-1..s+1] then '#' else '.'
+getCharToDraw :: [Int] -> Int -> Char
+getCharToDraw sprites clock = if abs (pos - s) <= 1 then '⬜' else '⬛'
     where
         pos = (clock - 1) `mod` 40
-        s = getSprite clock sprites
-
-clockGroups :: [[Int]]
-clockGroups = [[40 * i + 1.. 40*i + 40]| i <- [0..5]]
+        s = sprites !! (clock - 1)
 
 solve2 :: String -> [String]
-solve2 input = (map . map) (getCharToDraw sprites) clockGroups
+solve2 input = splitEvery 40 $ map (getCharToDraw sprites) [1..240]
     where sprites = instructionsToRegisterSeries $ parseInput input
 
 main :: IO ()
