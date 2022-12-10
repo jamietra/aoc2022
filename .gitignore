@@ -1,4 +1,5 @@
 /italos
 /compiled
-input/*.txt
+/input
+.DS_Store
 
