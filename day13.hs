@@ -43,6 +43,7 @@ inOrder [x:xs, y:ys]
   | isDigit x && y == '['  = inOrder [putInList (x:xs), y:ys]
   | x == ']'               = True
   | y == ']'               = False
+  -- no otherwise so we get an error if we missed something
 
 buildList :: String -> [Int]
 buildList = undefined
